@@ -9,10 +9,17 @@ const defaultConfiguration = {
     "rowLimit": 20000,
     "trellisDirection": "Columns",
     "maxTrellisCount": 10,
+    "showTooltips": true,
+    "showZoomX": false,
+    "showZoomY": false,
     "diagram": {
         "showGridY": true,
+        "showFormationLabels": true,
         "strokeDashArray": "4",
-        "strokeWidth": 1.5
+        "strokeWidth": 1.5,
+        "wellSpacingPerpendicularNeighborLimit": 2,
+        "wellSpacingHorizontalNeighborLimit": 1,
+        "wellSpacingVerticalNeighborLimit": 1
     }
 
 }

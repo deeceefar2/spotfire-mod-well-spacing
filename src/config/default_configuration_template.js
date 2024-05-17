@@ -24,10 +24,26 @@ const defaultConfigurationTemplate = {
         "datatype": "int",
         "minVal": 0
     },
+    "showTooltips": {
+        "label": "Show Tooltips",
+        "datatype": "boolean"
+    },
+    "showZoomX": {
+        "label": "Show X Axis Zoom",
+        "datatype": "boolean"
+    },
+    "showZoomY": {
+        "label": "Show Y Axis Zoom",
+        "datatype": "boolean"
+    },
     "diagram": {
         "label": "Well Spacing (\"Gun Barrel\") Diagram",
         "showGridY": {
             "label": "Show Grid Y",
+            "datatype": "boolean"
+        },
+        "showFormationLabels": {
+            "label": "Show Formation Labels",
             "datatype": "boolean"
         },
         "strokeDashArray": {
@@ -37,6 +53,21 @@ const defaultConfigurationTemplate = {
         "strokeWidth": {
             "label": "Stroke Width",
             "datatype": "double"
+        },
+        "wellSpacingPerpendicularNeighborLimit": {
+            "label": "Perpendicular Neighbor Limit",
+            "datatype": "int",
+            "enumeration": [1, 2]
+        },
+        "wellSpacingHorizontalNeighborLimit": {
+            "label": "Horizontal Neighbor Limit",
+            "datatype": "int",
+            "enumeration": [1, 2]
+        },
+        "wellSpacingVerticalNeighborLimit": {
+            "label": "Vertical Neighbor Limit",
+            "datatype": "int",
+            "enumeration": [1, 2]
         }
     }
 

@@ -7,48 +7,119 @@
 class VizConfiguration {
     static UI_MODE = 'form'; // basic | form
 
-    constructor(contentElem, isEditing, onChangeCallback, hasAxisOverride) {        
-        this.onChangeCallback = onChangeCallback;
-        this.hasAxisOverride = hasAxisOverride;
-        this.active = false;
+    // Event types
+    static CONFIG_CHANGE_EVENT = 'configchange';
 
-        this.ui = new VizConfigurationUI(this, contentElem, isEditing, onChangeCallback);
-        this.ui.draw();
+    // Declare properties
+    #axes;                  // Axes in the viz to test for override
+    #ui;                    // UI object
+
+    #active = false;        // Active flag if configuration panel is displayed
+    #configuration;         // Configuration object
+
+    #eventListeners = {};   // Event listeners
+
+
+    constructor(mainElem, contentElem, isEditing, axes) {        
+        this.#axes = axes;
+
+        this.#ui = new VizConfigurationUI(this, mainElem, contentElem, isEditing);
+        this.#ui.draw();
+    }
+
+    // Sets the configuration from an object
+    setConfiguration(configurationObj) {
+        this.#configuration = configurationObj;
     }
 
     // Sets the configuration from a configuration string
     setConfigurationStr(configStr) {
         // If configStr length is zero then it's a new mod so set to the default configuration object
         if(configStr == null || configStr.length == 0) {
-            this.configuration = JSON.parse(JSON.stringify(defaultConfiguration));
-            this.onChangeCallback(this.configuration);
+            this.setConfiguration(JSON.parse(JSON.stringify(defaultConfiguration)));
+            this.notifyListeners(VizConfiguration.CONFIG_CHANGE_EVENT);
         }
         else {
-            this.configuration = JSON.parse(configStr)
+            this.setConfiguration(JSON.parse(configStr));
         }
 
         // Set configuration on the UI
-        this.ui.setConfiguration(this.configuration);
+        this.#ui.setConfiguration(this.getConfiguration());
     }
 
     // Gets the configuration
     getConfiguration() {
-        return this.configuration;
+        return this.#configuration;
     }
+
+    // Sets the active flag
+    setActive(flag) {
+        this.#active = flag;
+    }
+
+    // Returns the active flag
+    isActive() {
+        return this.#active;
+    }
+
+    // Has axis override
+    hasAxisOverride(name) {
+        const axis = this.#axes[name];
+        if(axis != null && axis.parts != null && axis.parts.length > 0)
+            return true;
+        return false;
+    }
+
+    // Notify listeners
+    notifyListeners(eventName) {
+        const e = {
+            name: eventName,
+            configuration: this.getConfiguration()
+        }
+
+        const eventListenerList = this.#eventListeners[eventName];
+        if(eventListenerList != null) {
+            for(let thisEventListener of eventListenerList) {
+                thisEventListener(e);
+            }
+        }
+    }
+
+    // Register event listener
+    addEventListener(eventName, callback) {
+        const eventNames = [VizConfiguration.CONFIG_CHANGE_EVENT];
+        if(eventNames.includes(eventName) == false) return;
+
+        let eventListenerList = this.#eventListeners[eventName];
+        if(eventListenerList == null) {
+            eventListenerList = [];
+            this.#eventListeners[eventName] = eventListenerList;
+        }
+
+        eventListenerList.push(callback);
+    }
+
 }
 
 class VizConfigurationUI {
-    constructor(vizConfig, contentElem, isEditing, onChangeCallback) {
-        this.vizConfig = vizConfig;
-        this.contentElem = contentElem;
-        this.isEditing = isEditing;
-        this.onChangeCallback = onChangeCallback;
+    #vizConfig;         // VizConfiguration object (not used on this UI)
+    #mainElem;          // Content element
+    #contentElem;       // Main visualization element
+    #isEditing;         // is editing flag
 
-        this.vizElem = this.contentElem.querySelector('.visualization');
+    #configIconElem;    // Configuration icon element
+    #configElem;        // Configuration element
+    #ui;                // UI object
+
+    constructor(vizConfig, mainElem, contentElem, isEditing) {
+        this.#vizConfig = vizConfig;
+        this.#mainElem = mainElem;
+        this.#contentElem = contentElem;
+        this.#isEditing = isEditing;
     }
 
     draw() {
-        if(this.isEditing == false) return;
+        if(this.#isEditing == false) return;
         this.drawIcon();
         this.drawConfiguration();
     }
@@ -63,75 +134,84 @@ class VizConfigurationUI {
       		</svg>
         `;
 
-        let configIconElem = document.createElement('div');
+        const configIconElem = document.createElement('div');
         configIconElem.classList.add('configuration-icon');
         configIconElem.innerHTML = template.trim();        
 
-        this.contentElem.appendChild(configIconElem);
-        this.configIconElem = configIconElem;
+        this.#mainElem.appendChild(configIconElem);
+        this.#configIconElem = configIconElem;
 
-        let self = this;
-        configIconElem.onclick = function(event) {
+        const self = this;
+        configIconElem.addEventListener('click', function(event) {
             event.stopPropagation();
             self.viewConfiguration();
             configIconElem.style.display = 'none';
-        };
+        });
     }
 
     drawConfiguration() {
-        let self = this;
+        const self = this;
 
-        let onDiscardCallback = function() {
+        const onDiscardCallback = function() {
             self.hideConfiguration();
         };
 
-        let onSaveCallback = function(configObj) {
-            self.vizConfig.configuration = configObj;
+        const onSaveCallback = function(configObj) {
+            self.#vizConfig.setConfiguration(configObj);
             self.hideConfiguration();
-            self.onChangeCallback(configObj);
+            self.#vizConfig.notifyListeners(VizConfiguration.CONFIG_CHANGE_EVENT, self.#vizConfig);
         }
 
         if(VizConfiguration.UI_MODE == 'basic') {
-            this.ui = new VizConfigurationBasicUI(this.vizConfig, this.contentElem, onDiscardCallback, onSaveCallback);
+            this.#ui = new VizConfigurationBasicUI(this.#vizConfig, this.#mainElem, onDiscardCallback, onSaveCallback);
         }
         else if(VizConfiguration.UI_MODE == 'form') {
-            this.ui = new VizConfigurationFormUI(this.vizConfig, this.contentElem, onDiscardCallback, onSaveCallback);
+            this.#ui = new VizConfigurationFormUI(this.#vizConfig, this.#mainElem, onDiscardCallback, onSaveCallback);
         }
 
-        this.configElem = this.ui.draw();
+        this.#configElem = this.#ui.draw();
     }
 
     // Toggles the UI to view configuration
     viewConfiguration() {
-        this.ui.display();
-        this.vizElem.style.display = 'none';
-        this.configElem.style.display = 'flex';
-        this.configIconElem.style.display = 'none';
-        this.vizConfig.active = true;
+        this.#ui.display();
+        this.#contentElem.style.display = 'none';
+        this.#configElem.style.display = 'flex';
+        this.#configIconElem.style.display = 'none';
+        
+        this.#vizConfig.setActive(true);
     }
 
     // Toggles the UI to view visualization
     hideConfiguration() {
-        this.vizElem.style.display = 'flex';
-        this.configElem.style.display = 'none';
-        this.configIconElem.style.display = 'block';
-        this.vizConfig.active = false;
+        this.#contentElem.style.display = 'flex';
+        this.#configElem.style.display = 'none';
+        this.#configIconElem.style.display = 'block';
+        
+        this.#vizConfig.setActive(false);
     }
 
     // Sets a configuration object on the UI elements
     setConfiguration(configuration) {
-        if(this.ui != null) {
-            this.ui.setConfiguration(configuration);
+        if(this.#ui != null) {
+            this.#ui.setConfiguration(configuration);
         }
     }
+
 }
 
 class VizConfigurationBasicUI {
-    constructor(vizConfig, contentElem, onDiscardCallback, onSaveCallback) {
-        this.vizConfig = vizConfig;
-        this.contentElem = contentElem;
-        this.onDiscardCallback = onDiscardCallback;
-        this.onSaveCallback = onSaveCallback;
+    // Declare properties
+    #vizConfig;         // VizConfiguration object (not used on this UI)
+    #mainElem;          // Content element
+    #onDiscardCallback; // Callback when configuration is discarded
+    #onSaveCallback;    // Callback when configuration is saved
+
+    constructor(vizConfig, mainElem, onDiscardCallback, onSaveCallback) {
+        this.#vizConfig = vizConfig;
+        this.#mainElem = mainElem;
+        this.#onDiscardCallback = onDiscardCallback;
+        this.#onSaveCallback = onSaveCallback;
     }
 
     draw() {
@@ -149,46 +229,46 @@ class VizConfigurationBasicUI {
             </div>`;
 
         // Append template
-        let configElem = document.createElement('div');
+        const configElem = document.createElement('div');
         configElem.classList.add('configuration');
         configElem.innerHTML = template.trim();
-        this.contentElem.appendChild(configElem);
+        this.#mainElem.appendChild(configElem);
 
         // Get config text area
-        let configTextArea = configElem.querySelector('textarea');
+        const configTextArea = configElem.querySelector('textarea');
 
         // Get validation text
-        let validationTextElem = configElem.querySelector('.validation');
+        const validationTextElem = configElem.querySelector('.validation');
 
         // Prepare event handlers
-        let self = this;
+        const self = this;
 
         // Event handler on cancel button
-        let cancelButton = configElem.querySelector("button.cancel");
-        cancelButton.onclick = function() {
-            self.onDiscardCallback();
-        };
+        const cancelButton = configElem.querySelector("button.cancel");
+        cancelButton.addEventListener('click', function() {
+            self.#onDiscardCallback();
+        });
     
         // Event handler on save button
-        let saveButton = configElem.querySelector("button.save");
+        const saveButton = configElem.querySelector("button.save");
         saveButton.disabled = true;
-        saveButton.onclick = function() {
-            self.onSaveCallback(JSON.parse(configTextArea.value));
-        };
+        saveButton.addEventListener('click', function() {
+            self.#onSaveCallback(JSON.parse(configTextArea.value));
+        });
 
         // Event handler on reset button
-        let resetButton = configElem.querySelector("button.reset");
-        resetButton.onclick = function() {
+        const resetButton = configElem.querySelector("button.reset");
+        resetButton.addEventListener('click', function() {
             configTextArea.value = JSON.stringify(defaultConfiguration, null, 2);
-        };
+        });
 
         // Event handler on validate button
-        let validateButton = configElem.querySelector("button.validate");
-        validateButton.onclick = function() {
-            let validation = self.validateConfiguration(configElem, configTextArea.value);
+        const validateButton = configElem.querySelector("button.validate");
+        validateButton.addEventListener('click', function() {
+            const validation = self.validateConfiguration(configElem, configTextArea.value);
             saveButton.disabled = !validation.valid;
             validationTextElem.innerHTML = validation.message;
-        };
+        });
     
         // Create setConfiguration function
         this.setConfiguration = function(configuration) {
@@ -209,7 +289,7 @@ class VizConfigurationBasicUI {
 
     // Validates the specified configuration for JSON adherence
     validateConfiguration(configElem, configStr) {
-        let thisConfig = configStr;
+        let thisConfig = configStr; // let because it may be reassigned
         if(thisConfig == null)
             thisConfig = '';
         
@@ -228,11 +308,19 @@ class VizConfigurationBasicUI {
 }
 
 class VizConfigurationFormUI {
-    constructor(vizConfig, contentElem, onDiscardCallback, onSaveCallback) {
-        this.vizConfig = vizConfig;
-        this.contentElem = contentElem;
-        this.onDiscardCallback = onDiscardCallback;
-        this.onSaveCallback = onSaveCallback;
+    // Declare properties
+    #vizConfig;         // VizConfiguration object
+    #mainElem;          // Content element
+    #onDiscardCallback; // Callback when configuration is discarded (not used on this UI)
+    #onSaveCallback;    // Callback when configuration is saved
+
+    #configuration;
+
+    constructor(vizConfig, mainElem, onDiscardCallback, onSaveCallback) {
+        this.#vizConfig = vizConfig;
+        this.#mainElem = mainElem;
+        this.#onDiscardCallback = onDiscardCallback;
+        this.#onSaveCallback = onSaveCallback;
     }
 
     draw() {
@@ -244,39 +332,39 @@ class VizConfigurationFormUI {
             </div>`;
 
         // Append template
-        let configElem = document.createElement('div');
+        const configElem = document.createElement('div');
         configElem.classList.add('configuration');
         configElem.innerHTML = template.trim();
-        this.contentElem.appendChild(configElem);
+        this.#mainElem.appendChild(configElem);
 
         // Get form element
-        let configFormElem = configElem.querySelector('.form');
+        const configFormElem = configElem.querySelector('.form');
 
         // Prepare event handlers
-        let self = this;
+        const self = this;
 
         // Event handler on close button
-        let closeButton = configElem.querySelector("button.close");
-        closeButton.onclick = function() {
-            self.onSaveCallback(self.configuration);
-        };
+        const closeButton = configElem.querySelector("button.close");
+        closeButton.addEventListener('click', function() {
+            self.#onSaveCallback(self.#configuration);
+        });
     
         // Event handler on reset button
-        let resetButton = configElem.querySelector("button.reset");
-        resetButton.onclick = function() {
+        const resetButton = configElem.querySelector("button.reset");
+        resetButton.addEventListener('click', function() {
             self.setConfiguration(JSON.parse(JSON.stringify(defaultConfiguration)));
             self.display();
-        };
+        });
 
-        // Create setConfiguration function
+        // Set the configuration object
         this.setConfiguration = function(configuration) {
-            self.configuration = configuration;
+            self.#configuration = configuration;
         }
 
-        // Create display function
+        // Display the form
         this.display = function() {
             configFormElem.innerHTML = '';
-            self.appendElements(configFormElem, self.configuration, defaultConfigurationTemplate)
+            self.appendElements(configFormElem, self.#configuration, defaultConfigurationTemplate)
         }
 
         return configElem;
@@ -285,7 +373,7 @@ class VizConfigurationFormUI {
     // Draw elements
     appendElements(parentFormElem, configurationObj, configurationTemplate) {
         if(configurationTemplate != null && configurationTemplate.label != null) {
-            let groupLabelElem = document.createElement('div');
+            const groupLabelElem = document.createElement('div');
             groupLabelElem.classList.add('group-label');
             groupLabelElem.innerHTML = configurationTemplate.label;
             parentFormElem.appendChild(groupLabelElem);            
@@ -294,10 +382,10 @@ class VizConfigurationFormUI {
         // Iterate over the keys in the configuration
         for(let thisKey in configurationTemplate) {
             if(thisKey == 'label') continue;
-            let thisConfigTemplate = configurationTemplate[thisKey];
-            let overridden = false;
+            const thisConfigTemplate = configurationTemplate[thisKey];
+            let overridden = false; // let because it may be reassigned
             if(thisConfigTemplate.axisOverride != null) {
-                overridden = this.vizConfig.hasAxisOverride(thisConfigTemplate.axisOverride);
+                overridden = this.#vizConfig.hasAxisOverride(thisConfigTemplate.axisOverride);
             }
 
             if(thisConfigTemplate != null && thisConfigTemplate.datatype != null) {
@@ -313,16 +401,16 @@ class VizConfigurationFormUI {
     appendFormElement(parentFormElem, configurationObj, configMemberKey, configTemplate, overridden) {
         if(overridden == true) return;
 
-        let formElem = document.createElement('div');
+        const formElem = document.createElement('div');
         formElem.classList.add('form-element');
         parentFormElem.appendChild(formElem);
 
-        let formLabelElem = document.createElement('div');
+        const formLabelElem = document.createElement('div');
         formLabelElem.classList.add('label');
         formLabelElem.innerHTML = configTemplate.label;
         formElem.appendChild(formLabelElem);
         
-        let formDataElem = document.createElement('div');
+        const formDataElem = document.createElement('div');
         formDataElem.classList.add('data');
         formElem.appendChild(formDataElem);
         
@@ -338,15 +426,16 @@ class VizConfigurationFormUI {
         }
     }
 
+    // Draw enumeration form
     appendEnumerationForm(formDataElem, configurationObj, configMemberKey, configTemplate) {
         // Select
         formDataElem.classList.add('select');
 
-        let selectElem = document.createElement('select');
+        const selectElem = document.createElement('select');
         formDataElem.appendChild(selectElem);
 
         for(let thisEnumItem of configTemplate.enumeration) {
-            let optionElem = document.createElement('option');
+            const optionElem = document.createElement('option');
             optionElem.innerHTML = thisEnumItem;
             selectElem.appendChild(optionElem);
 
@@ -356,31 +445,33 @@ class VizConfigurationFormUI {
         }
 
         // Change listener to push new value to config object
-        selectElem.onchange = function() {
+        selectElem.addEventListener('change', function() {
             configurationObj[configMemberKey] = selectElem.value;
-        };
+        });
     }
 
+    // Draw boolean form
     appendBooleanForm(formDataElem, configurationObj, configMemberKey, configTemplate) {
         // Checkbox
         formDataElem.classList.add('checkbox');
 
-        let checkboxElem = document.createElement('input');
+        const checkboxElem = document.createElement('input');
         checkboxElem.setAttribute('type', 'checkbox');
         formDataElem.appendChild(checkboxElem);
         checkboxElem.checked = configurationObj[configMemberKey];
         
         // Change listener to push new value to config object
-        checkboxElem.onchange = function() {
+        checkboxElem.addEventListener('change', function() {
             configurationObj[configMemberKey] = checkboxElem.checked;
-        };
+        });
     }
 
+    // Draw input form
     appendInputForm(formDataElem, configurationObj, configMemberKey, configTemplate) {
         // Input
         formDataElem.classList.add('input');
 
-        let inputElem = document.createElement('input');
+        const inputElem = document.createElement('input');
         formDataElem.appendChild(inputElem);
         inputElem.value = configurationObj[configMemberKey];
 
@@ -390,13 +481,13 @@ class VizConfigurationFormUI {
         }
 
         // Change listener to push new value to config object
-        inputElem.oninput = function() {
+        inputElem.addEventListener('input', function() {
             if(configTemplate.datatype == 'int')
                 configurationObj[configMemberKey] = parseInt(inputElem.value);
             else if(configTemplate.datatype == 'double')
                 configurationObj[configMemberKey] = parseFloat(inputElem.value);
             else
                 configurationObj[configMemberKey] = inputElem.value;
-        };
+        });
     }
 }

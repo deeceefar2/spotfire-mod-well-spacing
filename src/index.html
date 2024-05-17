@@ -10,27 +10,29 @@
 
         <!-- Main -->
         <script src="main.js"></script>
-        <script src="default_configuration.js"></script>
-        <script src="default_configuration_template.js"></script>
 
         <!-- Mod libs -->
         <script src="well_spacing_diagram.js"></script>
-        <script src="rect_marking.js"></script>
-        <script src="utility.js"></script>
-        <script src="viz_configuration.js"></script>
+        <script src="config/default_configuration.js"></script>
+        <script src="config/default_configuration_template.js"></script>
+
+        <!-- Common mod libs -->
+        <script src="common/rect_marking.js"></script>
+        <script src="common/trellis.js"></script>
+        <script src="common/utility.js"></script>
+        <script src="common/viz_configuration.js"></script>
+        <script src="common/zoom_handler.js"></script>
 
         <!-- Third-party libs -->
         <script src="lib/d3.v7.min.js" charset="utf-8" async></script>
 
         <!-- Style -->
-        <link rel="stylesheet" type="text/css" media="all" href="well_spacing_diagram.css" />
-        <link rel="stylesheet" type="text/css" media="all" href="main.css" />
+        <link rel="stylesheet" type="text/css" media="all" href="css/well_spacing_diagram.css" />
+        <link rel="stylesheet" type="text/css" media="all" href="css/main.css" />
     </head>
     <body>
 
-        <div class="content">
-            <div class="visualization"></div>
-        </div>
+        <div class="main"></div>
 
     </body>
 </html>

@@ -1,14 +1,19 @@
 {
     "apiVersion": "1.3",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "name": "Well Spacing (\"Gun Barrel\") Diagram",
     "id": "well-spacing-diagram",
-    "icon": "icon.svg",
+    "icon": "images/wellSpacingGunbarrel_24x24.svg",
     "properties": [
         {
             "name": "mod-config",
             "type": "string",
             "defaultValue": ""
+        },
+        {
+            "name": "zoom",
+            "type": "string",
+            "defaultValue": "{\"x\":{\"rangeFrom\":0.0,\"rangeTo\":1.0},\"y\":{\"rangeFrom\":0.0,\"rangeTo\":1.0}}"
         }
     ],
     "dataViewDefinition": {
@@ -42,11 +47,6 @@
                 "placement": "none"
             },
             {
-                "name": "Label",
-                "mode": "categorical",
-                "placement": "none"
-            },
-            {
                 "name": "Size",
                 "mode": "continuous",
                 "allowNonAggregatingMeasures": true,
@@ -71,15 +71,17 @@
     },
     "files": [
         "index.html",
-        "main.css",
-        "default_configuration.js",
-        "default_configuration_template.js",
-        "well_spacing_diagram.css",
         "well_spacing_diagram.js",
         "main.js",
-        "rect_marking.js",
-        "utility.js",
-        "viz_configuration.js",
+        "config/default_configuration.js",
+        "config/default_configuration_template.js",
+        "common/rect_marking.js",
+        "common/trellis.js",
+        "common/utility.js",
+        "common/viz_configuration.js",
+        "common/zoom_handler.js",
+        "css/main.css",
+        "css/well_spacing_diagram.css",
         "lib/d3.v7.min.js",
         "images/right-angle.png",
         "images/straight-line.png"

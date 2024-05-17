@@ -1,3 +1,6 @@
+# ignore .vscode directory
+.vscode/
+
 # ignore package-lock.json
 package-lock.json
 

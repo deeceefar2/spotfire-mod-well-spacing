@@ -13,7 +13,7 @@ The Well Spacing ("Gun Barrel") Diagram Mod is used to visualize the spacing of 
 1. The visualization mod is added to the analysis.
 1. To learn about the capabilities and limitations of this visualization mod, keep reading.
 
-For general information on how to use and share visualization mods, [read the Spotfire documentation](https://docs.tibco.com/pub/sfire-analyst/14.1.0/doc/html/en-US/TIB_sfire-analyst_UsersGuide/index.htm#t=modvis%2Fmodvis_how_to_use_a_visualization_mod.htm).
+For general information on how to use and share visualization mods, [read the Spotfire documentation](https://docs.tibco.com/pub/sfire-analyst/latest/doc/html/en-US/TIB_sfire-analyst_UsersGuide/index.htm#t=modvis%2Fmodvis_how_to_use_a_visualization_mod.htm).
 
 ## Data requirements
 
@@ -56,7 +56,7 @@ For example, if no grouping is specified for wells, the digram will render like 
 
 But if grouped, will render like this:
 
-![Wells no group](./doc/images/wells-group.png)
+![Wells grouped](./doc/images/wells-group.png)
 
 Note how the distances change.
 
@@ -69,10 +69,6 @@ Concatenate([layerType],"-",If([layerType]="formation",[name],[reservoir]))
 ### Name 
 
 Optional. Display name for well rows to display when hovered with the mouse. No effect on formation rows.
-
-### Label 
-
-Optional. Additional label for well rows to display when hovered with the mouse. No effect on formation rows.
 
 ### Size 
 
@@ -105,9 +101,17 @@ Additional configuration for the mod can be accessed by clicking on the small se
 | Row Limit | Maximum number of rows to render | If the row count is exceeded then an error message will be displayed. This is a safety feature to keep from accidentally rendering too much data. |
 | Trellis Direction | Direction for trellis panels | Columns or Rows |
 | Max Trellis Panel Count | Maximum number of trellis panels to render | If the panel count is exceeded then an error message will be displayed. This is a safety feature to keep from accidentally rendering too much data. |
+| Show Tooltips | Display tooltips | Applies to wells and formations |
+| Show X Axis Zoom | Display X-axis zoom slider | |
+| Show Y Axis Zoom | Display Y-axis zoom slider | |
 | Show Grid Y | Display Y-axis grid |  |
+| Show Formation Labels | Display formation labels | | 
 | Stroke Dash Array | Dash array for formation lines | This follows the SVG standard for stroke dash array |
 | Stroke Width | Line width for formation lines |  |
+| Perpendicular Neighbor Limit | Number of display neighbors for perpendicular distances | | 
+| Horizontal Neighbor Limit | Number of display neighbors for horizontal distances | | 
+| Vertical Neighbor Limit | Number of display neighbors for vertical distances | | 
+
 
 ## Using the Well Spacing ("Gun Barrel") Diagram
 
@@ -117,7 +121,7 @@ Once the mod is configured it will render a lateral section of wells and formati
 The mod supports marking of well rows if configured. Click a well to mark it. Use CTRL-Click to add additional rows to the marking, or remove an already marked row. To clear the marking, click in any open area.
 
 ### Well Distances
-To display distances between wells, select an option from the drop down. This will draw the distance between each well and it's two nearest neighbors within the same configured group.
+To display distances between wells, select an option from the drop down. This will draw the distance between each well and it's  nearest neighbors within the same configured group. In the mod configuration the number of neighbors can be separately configured to 1 or 2 for each of the different display types.
 
 * **Horizontal** - display a horizontal line and distance between a well and two nearest
 

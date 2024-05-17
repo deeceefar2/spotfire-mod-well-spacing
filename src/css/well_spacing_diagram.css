@@ -1,0 +1,139 @@
+/*
+ * Copyright © 2024. Cloud Software Group, Inc.
+ * This file is subject to the license terms contained
+ * in the license file that is distributed with this file.
+ */
+
+/* WELL SPACING DIAGRAM */
+div.visualization div.canvas > div.well-spacing-diagram {
+	flex: 1 1 auto;
+	position:relative;
+    display:flex;
+    flex-direction: column;
+	/*background-color:lightyellow;
+	border:1px solid goldenrod;*/
+    padding-top:10px;
+    overflow:hidden;
+}
+
+/* Toolbar */
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar{
+    height:25px;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+    margin-bottom:10px;
+    padding-right:5px;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar > div.limit-to-marking{
+    display:none;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram.markable > div.toolbar > div.limit-to-marking{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar div.distance-select-label {
+    font-size:12px;
+    padding-right:10px;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar > select {
+    font-size:12px;
+    color:#888888;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar > button {
+    font-size:12px;
+    margin-left:5px;
+    background-color: #EEEEEE;
+    border: 1px solid #AAAAAA;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar > button > img{
+    height:15px;
+    width:15px;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar > button:hover {
+    cursor: pointer;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.toolbar > button.active {
+    background-color: #555555;
+}
+
+/* Plot area */
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area{
+    flex: 1 1 auto;
+}
+
+/* Formations */
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg text.formation-label {
+    fill: #666666;
+    font-size:11px;
+    text-anchor: end;
+}
+
+div.content.dark > div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg text.formation-label {
+    fill: white;
+}
+
+/* Wells */
+div.visualization div.canvas > div.well-spacing-diagram.markable > div.plot-area > svg circle.well {
+    stroke-width: 1px;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram.markable > div.plot-area > svg circle.well:hover {
+    cursor: pointer;
+    stroke: #666666;
+}
+
+/* Background grid */
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg line.grid {
+    stroke: #EEEEEE;
+    stroke-width: 1;
+}
+
+/* Delta distance - perpendicular, horizontal, vertical */
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg g.delta-distance {
+    visibility: hidden;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg g.delta-distance.visible {
+    visibility: visible;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg line.delta-distance {
+    stroke: dodgerblue;
+    stroke-width: 0.5;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg line.delta-distance.boundary {
+    stroke-dasharray: 2;
+}
+
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg text.delta-distance {
+    font-size: 10px;
+    text-anchor: middle;
+}
+
+/* Measuring stick */
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg line.measuring-stick {
+    stroke: limegreen;
+    stroke-width: 1;
+}
+
+/*div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg line.measuring-stick.boundary {
+    stroke-dasharray: 2;
+}*/
+
+div.visualization div.canvas > div.well-spacing-diagram > div.plot-area > svg text.measuring-stick {
+    font-size: 10px;
+    text-anchor: middle;
+}
+
