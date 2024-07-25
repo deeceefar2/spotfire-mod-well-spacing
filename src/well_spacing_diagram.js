@@ -26,6 +26,10 @@ class WellSpacingDiagram {
     static DISTANCE_MODE_NONE = 'none'; // Lower case version of the ones in the select
     static DISTANCE_MODES = ['None', 'Horizontal', 'Perpendicular', 'Vertical', 'Vertical + Horizontal'];
 
+    // Layer types
+    static LAYER_TYPE_FORMATION = 'formation';
+    static LAYER_TYPE_WELLS = 'wells';
+
     // Declare properties set in constructor
     #canvasElem;
     #actions;
@@ -904,10 +908,10 @@ class WellSpacingDiagram {
         // Sort groups into formations and wells
         for(const thisGroupName in groupMap) {
             const thisGroup = groupMap[thisGroupName];
-            if(thisGroup.getType() == 'formation') {
+            if(thisGroup.getType() == WellSpacingDiagram.LAYER_TYPE_FORMATION) {
                 formations.push(thisGroup);                
             }
-            else if(thisGroup.getType() == 'wells') {
+            else if(thisGroup.getType() == WellSpacingDiagram.LAYER_TYPE_WELLS) {
                 wells.push(thisGroup);
             }
         }
@@ -1106,6 +1110,7 @@ class WellSpacingDiagram {
 
     // Rectangular selection
     rectangleSelection(selection) {
+        const configuration = this.#configuration;
         const plotAreaElem = this.#plotAreaElem;
         const groupMap = this.#groupMap;
         const scales = this.#scales;
@@ -1138,6 +1143,13 @@ class WellSpacingDiagram {
         for(const thisGroupName in groupMap) {
             const thisDataGroup = groupMap[thisGroupName];
             for(const thisData of thisDataGroup.getData()) {
+                // Only process if marking enabled for layer type
+                if(thisData.layerType == WellSpacingDiagram.LAYER_TYPE_FORMATION && configuration.allowFormationMarking != true)
+                    continue;
+                if(thisData.layerType == WellSpacingDiagram.LAYER_TYPE_WELLS && configuration.allowWellMarking != true)
+                    continue;
+
+                // Calculate svg x and y then test if in the selection box
                 const svgX = xScale(thisData.x) - selection.offsetLeft + WellSpacingDiagram.LEFT_MARGIN;
                 const svgY = yScale(thisData.y) - selection.offsetTop + WellSpacingDiagram.TOP_MARGIN;
                 if(pointInSelectionBox(svgX, svgY) == true) {

@@ -111,6 +111,8 @@ Additional configuration for the mod can be accessed by clicking on the small se
 | Perpendicular Neighbor Limit | Number of display neighbors for perpendicular distances | | 
 | Horizontal Neighbor Limit | Number of display neighbors for horizontal distances | | 
 | Vertical Neighbor Limit | Number of display neighbors for vertical distances | | 
+| Allow Well Marking | Allow rectangular marking to select wells | Even if false, wells can still be marked by clicking| 
+| Allow Formation Marking | Allow rectangular marking to select formations | | 
 
 
 ## Using the Well Spacing ("Gun Barrel") Diagram

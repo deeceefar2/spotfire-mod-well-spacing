@@ -144,6 +144,8 @@ Spotfire.initialize(async (mod) => {
             wellSpacingPerpendicularNeighborLimit: configuration.diagram.wellSpacingPerpendicularNeighborLimit,
             wellSpacingHorizontalNeighborLimit: configuration.diagram.wellSpacingHorizontalNeighborLimit,
             wellSpacingVerticalNeighborLimit: configuration.diagram.wellSpacingVerticalNeighborLimit,
+            allowWellMarking: configuration.diagram.allowWellMarking,
+            allowFormationMarking: configuration.diagram.allowFormationMarking,
         };
 
         // Create an actions object for callback functions
@@ -300,10 +302,10 @@ Spotfire.initialize(async (mod) => {
                     selectedRows.push(thisSelectedRows);
                 }
             }
-            
+
             // Flatten the array of arrays
             selectedRows = selectedRows.flat();
-            
+
             // If there are no selected rows, clear any current marking
             if(selectedRows.length == 0) {
                 clearAllMarking();

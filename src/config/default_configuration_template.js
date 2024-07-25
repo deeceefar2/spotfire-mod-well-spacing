@@ -68,7 +68,15 @@ const defaultConfigurationTemplate = {
             "label": "Vertical Neighbor Limit",
             "datatype": "int",
             "enumeration": [1, 2]
-        }
+        },
+        "allowWellMarking": {
+            "label": "Allow Well Marking",
+            "datatype": "boolean"
+        },
+        "allowFormationMarking": {
+            "label": "Allow Formation Marking",
+            "datatype": "boolean"
+        },
     }
 
 }

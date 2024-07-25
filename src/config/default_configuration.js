@@ -19,7 +19,9 @@ const defaultConfiguration = {
         "strokeWidth": 1.5,
         "wellSpacingPerpendicularNeighborLimit": 2,
         "wellSpacingHorizontalNeighborLimit": 1,
-        "wellSpacingVerticalNeighborLimit": 1
+        "wellSpacingVerticalNeighborLimit": 1,
+        "allowWellMarking": true,
+        "allowFormationMarking": true,
     }
 
 }
